@@ -1,4 +1,4 @@
-import { useState, Fragment } from "react";
+import { useState, Fragment, useEffect } from "react";
 import { Dialog, Disclosure, Menu, Transition } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { Link } from "react-router-dom";
@@ -10,7 +10,10 @@ import {
   Squares2X2Icon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  StarIcon,
 } from "@heroicons/react/20/solid";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchAllProductsAsync, selectAllProducts } from "../productSlice";
 
 const sortOptions = [
   { name: "Most Popular", href: "#", current: true },
@@ -60,7 +63,7 @@ const filters = [
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-const products = [
+const oldProducts = [
   {
     id: 1,
     name: "Basic Tee",
@@ -105,7 +108,12 @@ const products = [
 ];
 
 export default function ProductList() {
+  const dispatch = useDispatch();
+  const products = useSelector(selectAllProducts);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  useEffect(() => {
+    dispatch(fetchAllProductsAsync());
+  }, []);
   return (
     <>
       <div className="bg-white">
@@ -357,34 +365,45 @@ export default function ProductList() {
                   <div className="bg-white">
                     <div className="mx-auto max-w-2xl px-4 py-16 sm:px-6 sm:py-24 lg:max-w-7xl lg:px-8">
                       <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-4 xl:gap-x-8">
-                        {products.map((product) => (
-                          <Link to="/product-detail">
-                            <div key={product.id} className="group relative">
-                              <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
+                        {products?.map((product) => (
+                          <Link to="/product-detail" key={product.id}>
+                            <div
+                              key={product.id}
+                              className="group relative border-solid border-2 p-2 border-gray-300"
+                            >
+                              <div className="min-h-60 aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-60">
                                 <img
-                                  src={product.imageSrc}
-                                  alt={product.imageAlt}
+                                  src={product.thumbnail}
+                                  alt={product.title}
                                   className="h-full w-full object-cover object-center lg:h-full lg:w-full"
                                 />
                               </div>
                               <div className="mt-4 flex justify-between">
                                 <div>
                                   <h3 className="text-sm text-gray-700">
-                                    <a href={product.href}>
+                                    <a href={product.thumbnail}>
                                       <span
                                         aria-hidden="true"
                                         className="absolute inset-0"
                                       />
-                                      {product.name}
+                                      {product.title}
                                     </a>
                                   </h3>
                                   <p className="mt-1 text-sm text-gray-500">
-                                    {product.color}
+                                    <StarIcon className="w-6 h-6 inline"></StarIcon>{" "}
+                                    <span className="align-bottom">
+                                      {product.rating}
+                                    </span>
                                   </p>
                                 </div>
-                                <p className="text-sm font-medium text-gray-900">
-                                  {product.price}
-                                </p>
+                                <div>
+                                  <p className="text-sm block font-medium text-gray-900">
+                                    ${product.discountPrice}
+                                  </p>
+                                  <p className="text-sm block line-through font-medium text-gray-400">
+                                    ${product.price}
+                                  </p>
+                                </div>
                               </div>
                             </div>
                           </Link>
@@ -398,13 +417,13 @@ export default function ProductList() {
             <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
               <div className="flex flex-1 justify-between sm:hidden">
                 <a
-                  href="#"
+                  href="/id"
                   className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                   Previous
                 </a>
                 <a
-                  href="#"
+                  href="/id"
                   className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
                 >
                   Next
@@ -424,7 +443,7 @@ export default function ProductList() {
                     aria-label="Pagination"
                   >
                     <a
-                      href="#"
+                      href="/id"
                       className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                     >
                       <span className="sr-only">Previous</span>
@@ -432,20 +451,20 @@ export default function ProductList() {
                     </a>
                     {/* Current: "z-10 bg-indigo-600 text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600", Default: "text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:outline-offset-0" */}
                     <a
-                      href="#"
+                      href="/id"
                       aria-current="page"
                       className="relative z-10 inline-flex items-center bg-indigo-600 px-4 py-2 text-sm font-semibold text-white focus:z-20 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
                       1
                     </a>
                     <a
-                      href="#"
+                      href="/id"
                       className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                     >
                       2
                     </a>
                     <a
-                      href="#"
+                      href="/id"
                       className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
                     >
                       3
@@ -454,25 +473,25 @@ export default function ProductList() {
                       ...
                     </span>
                     <a
-                      href="#"
+                      href="/id"
                       className="relative hidden items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 md:inline-flex"
                     >
                       8
                     </a>
                     <a
-                      href="#"
+                      href="/id"
                       className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                     >
                       9
                     </a>
                     <a
-                      href="#"
+                      href="/id"
                       className="relative inline-flex items-center px-4 py-2 text-sm font-semibold text-gray-900 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                     >
                       10
                     </a>
                     <a
-                      href="#"
+                      href="/id"
                       className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0"
                     >
                       <span className="sr-only">Next</span>
